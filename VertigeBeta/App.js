@@ -5,14 +5,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
-import CheckBox from '@react-native-community/checkbox'; // Correct import
+import Checkbox from 'expo-checkbox'; // Correct import
 
 // Home Screen
 function HomeScreen() {
   return (
     <View style={styles.screenContainer}>
       <Text style={{ fontSize: 40, color: 'white' }}>Vertige Beta</Text>
-      <Text style={{ fontSize: 16, color: 'white' }}>Let's create a payment feature. This is test text. </Text>
+      <Text style={{ fontSize: 16, color: 'white' }}>Let's create a payment feature. This is test text.</Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -20,15 +20,15 @@ function HomeScreen() {
 
 // Profile Screen
 function ProfileScreen() {
-  const randomName = "John Doe";
-  const randomEmail = "johndoe@example.com";
+  const randomName = "Niel Roy";
+  const randomEmail = "royniel@vertige.com";
   const randomAge = Math.floor(Math.random() * 50) + 18; // Random age between 18 and 67
 
   return (
     <View style={styles.screenContainer}>
-      <Text>Name: {randomName}</Text>
-      <Text>Email: {randomEmail}</Text>
-      <Text>Age: {randomAge}</Text>
+      <Text style={styles.text}>Name: {randomName}</Text>
+      <Text style={styles.text}>Email: {randomEmail}</Text>
+      <Text style={styles.text}>Age: {randomAge}</Text>
     </View>
   );
 }
@@ -41,8 +41,8 @@ function CalendarScreen({ navigation }) {
   return (
     <View style={styles.screenContainer}>
       {isPaidUser ? (
-        <View>
-          <Text>Today's Date: {currentDate}</Text>
+        <View style={styles.calendarContainer}>
+          <Text style={styles.text}>Today's Date: {currentDate}</Text>
           <Calendar
             current={new Date().toISOString().split('T')[0]}
             minDate={'2020-01-01'}
@@ -75,7 +75,7 @@ function CalendarScreen({ navigation }) {
         </View>
       ) : (
         <View>
-          <Text>This is a paid feature. Please upgrade to access.</Text>
+          <Text style={styles.text}>This is a paid feature. Please upgrade to access.</Text>
           <Button title="Upgrade to Premium" onPress={() => navigation.navigate('Payment')} />
         </View>
       )}
@@ -90,10 +90,10 @@ function ReminderScreen({ navigation }) {
   return (
     <View style={styles.screenContainer}>
       {isPaidUser ? (
-        <Text>Adding Reminder</Text>
+        <Text style={styles.text}>Adding Reminder</Text>
       ) : (
         <View>
-          <Text>This is a paid feature. Please upgrade to access.</Text>
+          <Text style={styles.text}>This is a paid feature. Please upgrade to access.</Text>
           <Button title="Upgrade to Premium" onPress={() => navigation.navigate('Payment')} />
         </View>
       )}
@@ -112,41 +112,47 @@ function SymptomsScreen({ navigation }) {
   });
 
   return (
+    
     <View style={styles.screenContainer}>
+      <Text style={{ fontSize: 25, color: 'white' }}>Select The Symptoms That are applicable : </Text>
       {isPaidUser ? (
         <View>
           <View style={styles.checkboxContainer}>
-            <CheckBox
+            <Checkbox
               value={symptoms.vertigo}
               onValueChange={(value) => setSymptoms({ ...symptoms, vertigo: value })}
+              color={symptoms.vertigo ? '#00adf5' : undefined}
             />
-            <Text>Vertigo</Text>
+            <Text style={styles.text}>Vertigo</Text>
           </View>
           <View style={styles.checkboxContainer}>
-            <CheckBox
+            <Checkbox
               value={symptoms.dizziness}
               onValueChange={(value) => setSymptoms({ ...symptoms, dizziness: value })}
+              color={symptoms.dizziness ? '#00adf5' : undefined}
             />
-            <Text>Dizziness</Text>
+            <Text style={styles.text}>Dizziness</Text>
           </View>
           <View style={styles.checkboxContainer}>
-            <CheckBox
+            <Checkbox
               value={symptoms.headache}
               onValueChange={(value) => setSymptoms({ ...symptoms, headache: value })}
+              color={symptoms.headache ? '#00adf5' : undefined}
             />
-            <Text>Headache</Text>
+            <Text style={styles.text}>Headache</Text>
           </View>
           <View style={styles.checkboxContainer}>
-            <CheckBox
+            <Checkbox
               value={symptoms.offBalance}
               onValueChange={(value) => setSymptoms({ ...symptoms, offBalance: value })}
+              color={symptoms.offBalance ? '#00adf5' : undefined}
             />
-            <Text>Off Balance</Text>
+            <Text style={styles.text}>Off Balance</Text>
           </View>
         </View>
       ) : (
         <View>
-          <Text>This is a paid feature. Please upgrade to access.</Text>
+          <Text style={styles.text}>This is a paid feature. Please upgrade to access.</Text>
           <Button title="Upgrade to Premium" onPress={() => navigation.navigate('Payment')} />
         </View>
       )}
@@ -158,8 +164,8 @@ function SymptomsScreen({ navigation }) {
 function PaymentScreen() {
   return (
     <View style={styles.screenContainer}>
-      <Text>Payment Screen</Text>
-      <Text>Complete the payment to unlock premium features.</Text>
+      <Text style={styles.text}>Payment Screen</Text>
+      <Text style={styles.text}>Complete the payment to unlock premium features.</Text>
     </View>
   );
 }
@@ -189,6 +195,18 @@ export default function App() {
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
+          tabBarStyle: {
+            width: '100%', // Ensure the tab bar takes up the full width
+            justifyContent: 'center', // Center the buttons
+            alignItems: 'center', // Align items vertically
+            height: 80, // Adjust the height of the tab bar
+            paddingHorizontal: 0, // Remove horizontal padding
+          },
+          tabBarItemStyle: {
+            flex: 1, // Distribute space equally among tab items
+            justifyContent: 'center', // Center the content of each tab item
+            alignItems: 'center', // Align items vertically
+          },
         })}
         tabBarOptions={{
           activeTintColor: 'blue',
@@ -208,14 +226,22 @@ export default function App() {
 
 const styles = StyleSheet.create({
   screenContainer: {
-    backgroundColor: 'grey',
+    backgroundColor: 'black',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  text: {
+    fontSize: 20,
+    color: 'white',
+  },
   checkboxContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
+    alignItems: 'Left',
+    marginVertical: 10,
+  },
+  calendarContainer: {
+    width: '100%',
+    padding: 20,
   },
 });
