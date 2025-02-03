@@ -3,32 +3,43 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
-import Checkbox from 'expo-checkbox'; // Correct import
+import Checkbox from 'expo-checkbox';
+import LoginScreen from './screens/LoginScreen';
+import SignupScreen from './screens/SignupScreen';
+
+// Stack Navigator for Authentication
+const AuthStack = createStackNavigator();
+function AuthStackScreen() {
+  return (
+    <AuthStack.Navigator>
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Signup" component={SignupScreen} />
+    </AuthStack.Navigator>
+  );
+}
 
 // Home Screen
-function HomeScreen() {
+function HomeScreen({ route }) {
+  const { email } = route.params || { email: 'Guest' };
   return (
     <View style={styles.screenContainer}>
-      <Text style={{ fontSize: 40, color: 'white' }}>Vertige Beta</Text>
-      <Text style={{ fontSize: 16, color: 'white' }}>Let's create a payment feature. This is test text.</Text>
+      <Text style={{ fontSize: 40, color: 'Teal' }}>Vertige Beta</Text>
+      <Text style={{ fontSize: 16, color: 'white' }}>This version of the application is only for the testing purpose.</Text>
       <StatusBar style="auto" />
     </View>
   );
 }
 
 // Profile Screen
-function ProfileScreen() {
-  const randomName = "Niel Roy";
-  const randomEmail = "royniel@vertige.com";
-  const randomAge = Math.floor(Math.random() * 50) + 18; // Random age between 18 and 67
+function ProfileScreen({ route }) {
+  const { email } = route.params || { email: 'Guest' }; // Get email from navigation params
 
   return (
     <View style={styles.screenContainer}>
-      <Text style={styles.text}>Name: {randomName}</Text>
-      <Text style={styles.text}>Email: {randomEmail}</Text>
-      <Text style={styles.text}>Age: {randomAge}</Text>
+      <Text style={styles.text}>Email: {email}</Text>
     </View>
   );
 }
@@ -112,7 +123,6 @@ function SymptomsScreen({ navigation }) {
   });
 
   return (
-    
     <View style={styles.screenContainer}>
       <Text style={{ fontSize: 25, color: 'white' }}>Select The Symptoms That are applicable : </Text>
       {isPaidUser ? (
@@ -172,54 +182,69 @@ function PaymentScreen() {
 
 // Create Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
+function MainApp({ route }) {
+  const { email } = route.params || { email: 'Guest' }; // Get email from navigation params
 
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'person' : 'person-outline';
+          } else if (route.name === 'Reminder') {
+            iconName = focused ? 'alarm' : 'alarm-outline';
+          } else if (route.name === 'Calendar') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
+          } else if (route.name === 'Symptoms') {
+            iconName = focused ? 'medkit' : 'medkit-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarStyle: {
+          width: '100%', // Ensure the tab bar takes up the full width
+          justifyContent: 'center', // Center the buttons
+          alignItems: 'center', // Align items vertically
+          height: 80, // Adjust the height of the tab bar
+          paddingHorizontal: 0, // Remove horizontal padding
+        },
+        tabBarItemStyle: {
+          flex: 1, // Distribute space equally among tab items
+          justifyContent: 'center', // Center the content of each tab item
+          alignItems: 'center', // Align items vertically
+        },
+      })}
+      tabBarOptions={{
+        activeTintColor: 'blue',
+        inactiveTintColor: 'gray',
+      }}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ email }} />
+      <Tab.Screen name="Reminder" component={ReminderScreen} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} />
+      <Tab.Screen name="Symptoms" component={SymptomsScreen} />
+      <Tab.Screen name="Payment" component={PaymentScreen} options={{ tabBarButton: () => null }} />
+    </Tab.Navigator>
+  );
+}
+
+// Main App Component
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-
-            if (route.name === 'Home') {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'Profile') {
-              iconName = focused ? 'person' : 'person-outline';
-            } else if (route.name === 'Reminder') {
-              iconName = focused ? 'alarm' : 'alarm-outline';
-            } else if (route.name === 'Calendar') {
-              iconName = focused ? 'calendar' : 'calendar-outline';
-            } else if (route.name === 'Symptoms') {
-              iconName = focused ? 'medkit' : 'medkit-outline';
-            }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarStyle: {
-            width: '100%', // Ensure the tab bar takes up the full width
-            justifyContent: 'center', // Center the buttons
-            alignItems: 'center', // Align items vertically
-            height: 80, // Adjust the height of the tab bar
-            paddingHorizontal: 0, // Remove horizontal padding
-          },
-          tabBarItemStyle: {
-            flex: 1, // Distribute space equally among tab items
-            justifyContent: 'center', // Center the content of each tab item
-            alignItems: 'center', // Align items vertically
-          },
-        })}
-        tabBarOptions={{
-          activeTintColor: 'blue',
-          inactiveTintColor: 'gray',
-        }}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-        <Tab.Screen name="Reminder" component={ReminderScreen} />
-        <Tab.Screen name="Calendar" component={CalendarScreen} />
-        <Tab.Screen name="Symptoms" component={SymptomsScreen} />
-        <Tab.Screen name="Payment" component={PaymentScreen} options={{ tabBarButton: () => null }} />
-      </Tab.Navigator>
+      {isLoggedIn ? (
+        <MainApp route={{ params: { email: userEmail } }} />
+      ) : (
+        <AuthStackScreen />
+      )}
     </NavigationContainer>
   );
 }
