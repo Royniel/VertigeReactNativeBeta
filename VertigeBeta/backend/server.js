@@ -76,5 +76,5 @@ app.post('/login', async (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on http://10.0.0.141:${PORT}`);
+  console.log(`Server running on http://ipaddress:${PORT}`);
 });
