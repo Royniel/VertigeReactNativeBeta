@@ -8,7 +8,7 @@ const LoginScreen = ({ navigation, setIsLoggedIn, setUserEmail }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://10.0.0.141:5002/login', {
+      const response = await axios.post('http://ipaddress:5002/login', {
         email,
         password,
       });
