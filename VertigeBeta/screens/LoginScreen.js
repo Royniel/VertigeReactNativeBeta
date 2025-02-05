@@ -8,13 +8,16 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/login', {
+      const response = await axios.post('http://10.0.0.118:5000/login', {
         email,
         password,
       });
       Alert.alert('Success', response.data.message);
       // Navigate to the main app screen after successful login
-      navigation.navigate('Home', { email: response.data.email });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainApp', params: { email: response.data.email } }],
+      });      
     } catch (error) {
       Alert.alert('Error', error.response?.data?.message || 'Login failed');
     }

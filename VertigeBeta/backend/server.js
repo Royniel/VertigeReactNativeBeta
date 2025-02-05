@@ -6,9 +6,9 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = 5000;
-
+const HOST = '10.0.0.118';
 // Middleware
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(bodyParser.json());
 
 // Connect to MongoDB
@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  premium: { type: Boolean, default: false },
 });
 
 const User = mongoose.model('User', userSchema);
@@ -49,7 +50,7 @@ app.post('/signup', async (req, res) => {
     res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -78,6 +79,4 @@ app.post('/login', async (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}`));

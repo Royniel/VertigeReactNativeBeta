@@ -9,7 +9,7 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/signup', {
+      const response = await axios.post('http://10.0.0.118:5000/signup', {
         name,
         email,
         password,
