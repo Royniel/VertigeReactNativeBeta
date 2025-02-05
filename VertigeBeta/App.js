@@ -12,10 +12,12 @@ import SignupScreen from './screens/SignupScreen';
 
 // Stack Navigator for Authentication
 const AuthStack = createStackNavigator();
-function AuthStackScreen() {
+function AuthStackScreen({ setIsLoggedIn, setUserEmail }) {
   return (
     <AuthStack.Navigator>
-      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Login">
+        {(props) => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} setUserEmail={setUserEmail} />}
+      </AuthStack.Screen>
       <AuthStack.Screen name="Signup" component={SignupScreen} />
     </AuthStack.Navigator>
   );
@@ -27,7 +29,7 @@ function HomeScreen({ route }) {
   return (
     <View style={styles.screenContainer}>
       <Text style={{ fontSize: 40, color: 'Teal' }}>Vertige Beta</Text>
-      <Text style={{ fontSize: 16, color: 'white' }}>This version of the application is only for the testing purpose.</Text>
+      <Text style={{ fontSize: 16, color: 'white' }}>This version of the application is only for testing purposes.</Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -60,27 +62,6 @@ function CalendarScreen({ navigation }) {
             maxDate={'2030-12-31'}
             onDayPress={(day) => {
               console.log('Selected day:', day);
-            }}
-            theme={{
-              backgroundColor: '#ffffff',
-              calendarBackground: '#ffffff',
-              textSectionTitleColor: '#b6c1cd',
-              selectedDayBackgroundColor: '#00adf5',
-              selectedDayTextColor: '#ffffff',
-              todayTextColor: '#00adf5',
-              dayTextColor: '#2d4150',
-              textDisabledColor: '#d9e1e8',
-              dotColor: '#00adf5',
-              selectedDotColor: '#ffffff',
-              arrowColor: '#00adf5',
-              monthTextColor: '#00adf5',
-              indicatorColor: '#00adf5',
-              textDayFontWeight: '300',
-              textMonthFontWeight: 'bold',
-              textDayHeaderFontWeight: '300',
-              textDayFontSize: 16,
-              textMonthFontSize: 16,
-              textDayHeaderFontSize: 16,
             }}
           />
         </View>
@@ -124,41 +105,19 @@ function SymptomsScreen({ navigation }) {
 
   return (
     <View style={styles.screenContainer}>
-      <Text style={{ fontSize: 25, color: 'white' }}>Select The Symptoms That are applicable : </Text>
+      <Text style={{ fontSize: 25, color: 'white' }}>Select The Symptoms That Are Applicable:</Text>
       {isPaidUser ? (
         <View>
-          <View style={styles.checkboxContainer}>
-            <Checkbox
-              value={symptoms.vertigo}
-              onValueChange={(value) => setSymptoms({ ...symptoms, vertigo: value })}
-              color={symptoms.vertigo ? '#00adf5' : undefined}
-            />
-            <Text style={styles.text}>Vertigo</Text>
-          </View>
-          <View style={styles.checkboxContainer}>
-            <Checkbox
-              value={symptoms.dizziness}
-              onValueChange={(value) => setSymptoms({ ...symptoms, dizziness: value })}
-              color={symptoms.dizziness ? '#00adf5' : undefined}
-            />
-            <Text style={styles.text}>Dizziness</Text>
-          </View>
-          <View style={styles.checkboxContainer}>
-            <Checkbox
-              value={symptoms.headache}
-              onValueChange={(value) => setSymptoms({ ...symptoms, headache: value })}
-              color={symptoms.headache ? '#00adf5' : undefined}
-            />
-            <Text style={styles.text}>Headache</Text>
-          </View>
-          <View style={styles.checkboxContainer}>
-            <Checkbox
-              value={symptoms.offBalance}
-              onValueChange={(value) => setSymptoms({ ...symptoms, offBalance: value })}
-              color={symptoms.offBalance ? '#00adf5' : undefined}
-            />
-            <Text style={styles.text}>Off Balance</Text>
-          </View>
+          {Object.keys(symptoms).map((key) => (
+            <View key={key} style={styles.checkboxContainer}>
+              <Checkbox
+                value={symptoms[key]}
+                onValueChange={(value) => setSymptoms({ ...symptoms, [key]: value })}
+                color={symptoms[key] ? '#00adf5' : undefined}
+              />
+              <Text style={styles.text}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
+            </View>
+          ))}
         </View>
       ) : (
         <View>
@@ -205,23 +164,7 @@ function MainApp({ route }) {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarStyle: {
-          width: '100%', // Ensure the tab bar takes up the full width
-          justifyContent: 'center', // Center the buttons
-          alignItems: 'center', // Align items vertically
-          height: 80, // Adjust the height of the tab bar
-          paddingHorizontal: 0, // Remove horizontal padding
-        },
-        tabBarItemStyle: {
-          flex: 1, // Distribute space equally among tab items
-          justifyContent: 'center', // Center the content of each tab item
-          alignItems: 'center', // Align items vertically
-        },
       })}
-      tabBarOptions={{
-        activeTintColor: 'blue',
-        inactiveTintColor: 'gray',
-      }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ email }} />
@@ -237,14 +180,35 @@ function MainApp({ route }) {
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const RootStack = createStackNavigator();
+
 
   return (
     <NavigationContainer>
-      {isLoggedIn ? (
-        <MainApp route={{ params: { email: userEmail } }} />
-      ) : (
-        <AuthStackScreen />
+      <RootStack.Navigator>
+  {isLoggedIn ? (
+    <RootStack.Screen 
+      name="MainApp" 
+      options={{ headerShown: false }}
+    >
+      {(props) => <MainApp {...props} email={userEmail} />}
+    </RootStack.Screen>
+  ) : (
+    <RootStack.Screen 
+      name="Auth" 
+      options={{ headerShown: false }}
+    >
+      {(props) => (
+        <AuthStackScreen
+          {...props}
+          setIsLoggedIn={setIsLoggedIn}
+          setUserEmail={setUserEmail}
+        />
       )}
+    </RootStack.Screen>
+  )}
+</RootStack.Navigator>
+
     </NavigationContainer>
   );
 }
@@ -262,7 +226,7 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: 'row',
-    alignItems: 'Left',
+    alignItems: 'left',
     marginVertical: 10,
   },
   calendarContainer: {
