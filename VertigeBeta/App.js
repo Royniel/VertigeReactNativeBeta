@@ -55,6 +55,63 @@ function CalendarScreen() {
   );
 }
 
+// Symptoms Screen (Premium Feature)
+function SymptomsScreen({ navigation }) {
+  const isPaidUser = false; // Set to true for testing
+  const [symptoms, setSymptoms] = useState({
+    vertigo: false,
+    dizziness: false,
+    headache: false,
+    offBalance: false,
+  });
+
+  return (
+    <View style={styles.screenContainer}>
+      <Text style={{ fontSize: 25, color: 'white' }}>Select The Symptoms That are applicable : </Text>
+      {isPaidUser ? (
+        <View>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              value={symptoms.vertigo}
+              onValueChange={(value) => setSymptoms({ ...symptoms, vertigo: value })}
+              color={symptoms.vertigo ? '#00adf5' : undefined}
+            />
+            <Text style={styles.text}>Vertigo</Text>
+          </View>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              value={symptoms.dizziness}
+              onValueChange={(value) => setSymptoms({ ...symptoms, dizziness: value })}
+              color={symptoms.dizziness ? '#00adf5' : undefined}
+            />
+            <Text style={styles.text}>Dizziness</Text>
+          </View>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              value={symptoms.headache}
+              onValueChange={(value) => setSymptoms({ ...symptoms, headache: value })}
+              color={symptoms.headache ? '#00adf5' : undefined}
+            />
+            <Text style={styles.text}>Headache</Text>
+          </View>
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              value={symptoms.offBalance}
+              onValueChange={(value) => setSymptoms({ ...symptoms, offBalance: value })}
+              color={symptoms.offBalance ? '#00adf5' : undefined}
+            />
+            <Text style={styles.text}>Off Balance</Text>
+          </View>
+        </View>
+      ) : (
+        <View>
+          <Text style={styles.text}>This is a paid feature. Please upgrade to access.</Text>
+          <Button title="Upgrade to Premium" onPress={() => navigation.navigate('Payment')} />
+        </View>
+      )}
+    </View>
+  );
+}
 // **Updated Reminder Screen with Functionality**
 function ReminderScreen() {
   const isPaidUser = true; // Replace with actual logic to check if the user has paid
@@ -150,6 +207,15 @@ function ReminderScreen() {
     </View>
   );
 }
+// Payment Screen (Dummy Screen for Upgrade)
+function PaymentScreen() {
+  return (
+    <View style={styles.screenContainer}>
+      <Text style={styles.text}>Payment Screen</Text>
+      <Text style={styles.text}>Complete the payment to unlock premium features.</Text>
+    </View>
+  );
+}
 
 // Create Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
@@ -169,6 +235,10 @@ function MainApp({ route }) {
             iconName = focused ? 'alarm' : 'alarm-outline';
           } else if (route.name === 'Calendar') {
             iconName = focused ? 'calendar' : 'calendar-outline';
+          } else if (route.name === 'Symptoms') {
+            iconName = focused ? 'medkit' : 'medkit-outline';
+          } else if (route.name === 'Payment') {
+            iconName = focused ? 'cash' : 'cash-outline';
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -178,6 +248,9 @@ function MainApp({ route }) {
       <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ email }} />
       <Tab.Screen name="Reminder" component={ReminderScreen} />
       <Tab.Screen name="Calendar" component={CalendarScreen} />
+      <Tab.Screen name="Symptoms" component={SymptomsScreen} />
+      <Tab.Screen name="Payment" component={PaymentScreen}  />
+
     </Tab.Navigator>
   );
 }
@@ -234,4 +307,3 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
 });
-
