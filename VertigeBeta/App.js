@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, TextInput, FlatList, Alert } from 'react-native';
+import { StyleSheet, ActivityIndicator, Text, View, Button, TextInput, FlatList, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -11,6 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
+import PaymentScreen from './screens/PaymentScreen';
+
+
 
 // Stack Navigator for Authentication
 const AuthStack = createStackNavigator();
@@ -46,7 +49,7 @@ function ProfileScreen({ route }) {
   );
 }
 
-// Calendar Screen (Premium Feature)
+// Calendar Screen 
 function CalendarScreen() {
   return (
     <View style={styles.screenContainer}>
@@ -207,15 +210,7 @@ function ReminderScreen() {
     </View>
   );
 }
-// Payment Screen (Dummy Screen for Upgrade)
-function PaymentScreen() {
-  return (
-    <View style={styles.screenContainer}>
-      <Text style={styles.text}>Payment Screen</Text>
-      <Text style={styles.text}>Complete the payment to unlock premium features.</Text>
-    </View>
-  );
-}
+
 
 // Create Bottom Tab Navigator
 const Tab = createBottomTabNavigator();
@@ -263,8 +258,7 @@ export default function App() {
   return (
     <NavigationContainer>
       {isLoggedIn ? (
-        <MainApp route={{ params: { email: userEmail } }} />
-      ) : (
+        <MainApp route={{ params: { email: userEmail } }} />) : (
         <AuthStackScreen />
       )}
     </NavigationContainer>

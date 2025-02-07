@@ -78,5 +78,20 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post('/update-premium', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOneAndUpdate({ email }, { premium: true }, { new: true });
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
+    res.json({ success: true, message: 'User updated to premium' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+
 // Start the server
 app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}`));
