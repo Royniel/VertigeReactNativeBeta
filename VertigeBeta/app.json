@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nielroy.VertigeBeta",
+      "bundleIdentifier": "com.VertigeLLC.VertigeBeta",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.nielroy.VertigeBeta"
+      "package": "com.VertigeLLC.VertigeBeta"
     },
     "web": {
       "favicon": "./assets/favicon.png"
