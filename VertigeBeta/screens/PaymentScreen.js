@@ -3,19 +3,25 @@ import { View, Text, Button, ActivityIndicator, Alert, StyleSheet } from 'react-
 import * as InAppPurchases from 'expo-in-app-purchases';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const productId = 'com.vertige.premium.monthly'; // Replace with your App Store product ID
+const productId = 'com.vertige.premium.monthly'; // Replace with your actual App Store product ID
 
 export default function PaymentScreen({ route, navigation }) {
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState(route.params?.email || '');
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     async function connectToStore() {
-      const { responseCode, results } = await InAppPurchases.connectAsync();
-      if (responseCode === InAppPurchases.IAPResponseCode.OK) {
-        console.log('Connected to App Store:', results);
-      } else {
-        Alert.alert('Error', 'Failed to connect to the App Store');
+      try {
+        const { responseCode, results } = await InAppPurchases.getProductsAsync([productId]);
+        
+        if (responseCode === InAppPurchases.IAPResponseCode.OK && results.length > 0) {
+          setProducts(results);
+        } else {
+          Alert.alert('Error', 'Failed to load payment options. Ensure IAP is set up in App Store Connect.');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Payment initialization failed.');
       }
     }
     connectToStore();
@@ -26,7 +32,7 @@ export default function PaymentScreen({ route, navigation }) {
     try {
       await InAppPurchases.purchaseItemAsync(productId);
     } catch (error) {
-      Alert.alert('Error', 'Payment failed');
+      Alert.alert('Error', 'Payment failed.');
     } finally {
       setLoading(false);
     }
@@ -39,13 +45,13 @@ export default function PaymentScreen({ route, navigation }) {
           if (!purchase.acknowledged) {
             await InAppPurchases.finishTransactionAsync(purchase, false);
             Alert.alert('Success', 'Subscription activated!');
-            updateUserPremiumStatus(userEmail); // Update MongoDB
+            updateUserPremiumStatus(userEmail);
           }
         });
       } else if (responseCode === InAppPurchases.IAPResponseCode.USER_CANCELED) {
-        Alert.alert('Cancelled', 'Payment was cancelled');
+        Alert.alert('Cancelled', 'Payment was cancelled.');
       } else {
-        Alert.alert('Error', 'Payment failed');
+        Alert.alert('Error', 'Payment failed.');
       }
     });
 
@@ -56,7 +62,7 @@ export default function PaymentScreen({ route, navigation }) {
 
   const updateUserPremiumStatus = async (email) => {
     try {
-      const response = await fetch('http://10.0.0.118:5000/update-premium', {
+      const response = await fetch('http://18.221.27.33:5000/update-premium', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -84,7 +90,11 @@ export default function PaymentScreen({ route, navigation }) {
       {loading ? (
         <ActivityIndicator size="large" color="#00adf5" />
       ) : (
-        <Button title="Pay with Apple Pay" onPress={handlePurchase} />
+        products.length > 0 ? (
+          <Button title={`Subscribe for ${products[0].price} ${products[0].currencyCode}`} onPress={handlePurchase} />
+        ) : (
+          <Text style={styles.errorText}>No payment options available. Ensure IAP is set up in App Store Connect.</Text>
+        )
       )}
     </View>
   );
@@ -108,6 +118,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
     marginBottom: 20,
+    textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    marginTop: 20,
     textAlign: 'center',
   },
 });

@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = 5000;
-const HOST = '10.0.0.118';
+const HOST = '0.0.0.0';
 // Middleware
 app.use(cors({ origin: '*' }));
 app.use(bodyParser.json());
@@ -91,6 +91,7 @@ app.post('/update-premium', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
+
 
 
 // Start the server
